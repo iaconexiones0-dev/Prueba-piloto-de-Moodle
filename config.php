@@ -9,7 +9,7 @@ $parts = parse_url($mysqlUrl);
 
 $CFG->dbtype    = 'mariadb';
 $CFG->dblibrary = 'native';
-$CFG->dbhost    = ($parts['host'] ?? 'localhost') . ':' . ($parts['port'] ?? 3306);
+$CFG->dbhost    = $parts['host'] ?? 'localhost';  // ← SIN PUERTO AQUÍ
 $CFG->dbname    = ltrim($parts['path'] ?? '/moodle', '/');
 $CFG->dbuser    = $parts['user'] ?? 'root';
 $CFG->dbpass    = $parts['pass'] ?? '';
@@ -22,8 +22,8 @@ $CFG->dboptions = array(
 );
 
 $domain = getenv('RAILWAY_PUBLIC_DOMAIN');
-$CFG->wwwroot = $domain ? 'https://' . $domain : 'http://localhost:8080';
-$CFG->dataroot = '/app/moodledata';
+$CFG->wwwroot = $domain ? 'https://' . $domain : 'http://localhost';  // ← SIN :8080
+$CFG->dataroot = '/var/www/html/moodledata';  // ← RUTA DE APACHE
 $CFG->admin = 'admin';
 $CFG->directorypermissions = 0777;
 
