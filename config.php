@@ -3,13 +3,12 @@ unset($CFG);
 global $CFG;
 $CFG = new stdClass();
 
-// Parse MySQL URL from Railway
 $mysqlUrl = getenv('MYSQL_URL') ?: getenv('DATABASE_URL') ?: 'mysql://root@localhost/moodle';
 $parts = parse_url($mysqlUrl);
 
 $CFG->dbtype    = 'mariadb';
 $CFG->dblibrary = 'native';
-$CFG->dbhost    = $parts['host'] ?? 'localhost';  // ← SIN PUERTO AQUÍ
+$CFG->dbhost    = $parts['host'] ?? 'localhost';
 $CFG->dbname    = ltrim($parts['path'] ?? '/moodle', '/');
 $CFG->dbuser    = $parts['user'] ?? 'root';
 $CFG->dbpass    = $parts['pass'] ?? '';
@@ -22,8 +21,8 @@ $CFG->dboptions = array(
 );
 
 $domain = getenv('RAILWAY_PUBLIC_DOMAIN');
-$CFG->wwwroot = $domain ? 'https://' . $domain : 'http://localhost';  // ← SIN :8080
-$CFG->dataroot = '/var/www/html/moodledata';  // ← RUTA DE APACHE
+$CFG->wwwroot = $domain ? 'https://' . $domain : 'http://localhost';
+$CFG->dataroot = '/app/moodledata';  // ← CAMBIO AQUÍ
 $CFG->admin = 'admin';
 $CFG->directorypermissions = 0777;
 
