@@ -1,15 +1,19 @@
-FROM php:8.2-apache
+FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install -y \
-    libzip-dev libpng-dev libxml2-dev libicu-dev git unzip \
-    && docker-php-ext-install mysqli pdo pdo_mysql gd zip intl soap opcache \
-    && a2enmod rewrite \
+    default-mysql-client \
+    libzip-dev \
+    libpng-dev \
+    libicu-dev \
+    unzip \
+    && docker-php-ext-install pdo pdo_mysql mysqli gd zip intl soap opcache \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /var/www/html
-COPY . .
-RUN mkdir -p moodledata && chmod 777 moodledata
-RUN chown -R www-data:www-data /var/www/html
+COPY . /app
+WORKDIR /app
 
-EXPOSE 80
-CMD ["apache2-foreground"]
+RUN mkdir -p moodledata && chmod 777 moodledata
+
+EXPOSE 8080
+
+CMD php -d display_errors=1 -S 0.0.0.0:8080 -t /app
