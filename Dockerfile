@@ -1,11 +1,11 @@
 FROM php:8.2-fpm
 
-
 RUN apt-get update && apt-get install -y \
     default-mysql-client \
     libzip-dev \
     libpng-dev \
     libicu-dev \
+    libxml2-dev \
     unzip \
     && docker-php-ext-install pdo pdo_mysql mysqli gd zip intl soap opcache \
     && rm -rf /var/lib/apt/lists/*
