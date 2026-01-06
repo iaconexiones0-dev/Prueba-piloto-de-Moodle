@@ -20,9 +20,7 @@ RUN docker-php-ext-install \
     zip \
     intl \
     soap \
-    xmlrpc \
-    opcache \
-    mysqli
+    opcache
 
 # Habilitar extensiones adicionales
 RUN docker-php-ext-enable \
@@ -42,4 +40,4 @@ RUN mkdir -p moodledata && chmod 777 moodledata
 EXPOSE 8080
 
 # Comando de inicio
-CMD php -S 0.0.0.0:8080 -t .
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "."]
