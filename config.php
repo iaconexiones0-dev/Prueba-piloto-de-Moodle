@@ -3,29 +3,17 @@ unset($CFG);
 global $CFG;
 $CFG = new stdClass();
 
-// Railway provee múltiples variables de MySQL
-$mysqlUrl = getenv('MYSQL_URL');
-$mysqlHost = getenv('MYSQLHOST');
-$mysqlDatabase = getenv('MYSQLDATABASE');
-$mysqlUser = getenv('MYSQLUSER');
-$mysqlPassword = getenv('MYSQLPASSWORD');
-$mysqlPort = getenv('MYSQLPORT');
+$mysqlUrl = getenv('DATABASE_URL') ?: getenv('MYSQL_URL');
 
-// Si existe MYSQL_URL, parsearla
 if ($mysqlUrl) {
     $parts = parse_url($mysqlUrl);
-    $CFG->dbhost = $parts['host'] ?? $mysqlHost ?? 'localhost';
-    $CFG->dbname = ltrim($parts['path'] ?? '/', '/') ?: $mysqlDatabase ?: 'railway';
-    $CFG->dbuser = $parts['user'] ?? $mysqlUser ?? 'root';
-    $CFG->dbpass = $parts['pass'] ?? $mysqlPassword ?? '';
-    $port = $parts['port'] ?? $mysqlPort ?? 3306;
+    $CFG->dbhost = $parts['host'] ?? 'localhost';
+    $CFG->dbname = ltrim($parts['path'] ?? '/railway', '/');
+    $CFG->dbuser = $parts['user'] ?? 'root';
+    $CFG->dbpass = $parts['pass'] ?? '';
+    $port = $parts['port'] ?? 3306;
 } else {
-    // Usar variables individuales
-    $CFG->dbhost = $mysqlHost ?: 'localhost';
-    $CFG->dbname = $mysqlDatabase ?: 'railway';
-    $CFG->dbuser = $mysqlUser ?: 'root';
-    $CFG->dbpass = $mysqlPassword ?: '';
-    $port = $mysqlPort ?: 3306;
+    die('ERROR: No DATABASE_URL found');
 }
 
 $CFG->dbtype    = 'mariadb';
