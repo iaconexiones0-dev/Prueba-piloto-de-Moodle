@@ -1,46 +1,30 @@
-<?php  // Moodle configuration file
-
+<?php
 unset($CFG);
 global $CFG;
 $CFG = new stdClass();
 
-// Configuración de Base de Datos PostgreSQL desde Railway
-$databaseUrl = getenv('DATABASE_URL') ?: 'postgresql://localhost:5432/moodle';
-$parsedUrl = parse_url($databaseUrl);
+// Parse MySQL URL from Railway
+$mysqlUrl = getenv('MYSQL_URL') ?: getenv('DATABASE_URL') ?: 'mysql://root@localhost/moodle';
+$parts = parse_url($mysqlUrl);
 
-$CFG->dbtype    = 'pgsql';
+$CFG->dbtype    = 'mariadb';
 $CFG->dblibrary = 'native';
-$CFG->dbhost    = $parsedUrl['host'] ?? 'localhost';
-$CFG->dbname    = ltrim($parsedUrl['path'] ?? '/moodle', '/');
-$CFG->dbuser    = $parsedUrl['user'] ?? 'postgres';
-$CFG->dbpass    = $parsedUrl['pass'] ?? '';
+$CFG->dbhost    = ($parts['host'] ?? 'localhost') . ':' . ($parts['port'] ?? 3306);
+$CFG->dbname    = ltrim($parts['path'] ?? '/moodle', '/');
+$CFG->dbuser    = $parts['user'] ?? 'root';
+$CFG->dbpass    = $parts['pass'] ?? '';
 $CFG->prefix    = 'mdl_';
-$CFG->dboptions = array (
-  'dbpersist' => 0,
-  'dbport' => $parsedUrl['port'] ?? 5432,
-  'dbsocket' => '',
+$CFG->dboptions = array(
+    'dbpersist' => 0,
+    'dbport' => $parts['port'] ?? 3306,
+    'dbsocket' => '',
+    'dbcollation' => 'utf8mb4_unicode_ci',
 );
 
-// WWW Root - Railway proporciona RAILWAY_PUBLIC_DOMAIN
 $domain = getenv('RAILWAY_PUBLIC_DOMAIN');
-if ($domain) {
-    $CFG->wwwroot = 'https://' . $domain;
-} else {
-    // Fallback para desarrollo local
-    $CFG->wwwroot = 'http://localhost:8080';
-}
-
-// Directorio de datos - en Railway debe estar dentro del proyecto
-$CFG->dataroot  = __DIR__ . '/moodledata';
-$CFG->admin     = 'admin';
-
+$CFG->wwwroot = $domain ? 'https://' . $domain : 'http://localhost:8080';
+$CFG->dataroot = '/app/moodledata';
+$CFG->admin = 'admin';
 $CFG->directorypermissions = 0777;
 
-// Configuraciones adicionales recomendadas para Railway
-$CFG->session_handler_class = '\core\session\database';
-$CFG->session_database_acquire_lock_timeout = 120;
-
 require_once(__DIR__ . '/lib/setup.php');
-
-// There is no php closing tag in this file,
-// it is intentional because it prevents trailing whitespace problems!
